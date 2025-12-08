@@ -21,6 +21,11 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
     
+    @GetMapping("/board/{boardId}")
+    public ResponseEntity<List<TaskDTO>> getTasksByBoardId(@PathVariable Long boardId) {
+        return ResponseEntity.ok(taskService.getTasksByBoardId(boardId));
+    }
+    
     @GetMapping("/{id}")
     public ResponseEntity<TaskDTO> getTaskById(@PathVariable Long id) {
         return ResponseEntity.ok(taskService.getTaskById(id));

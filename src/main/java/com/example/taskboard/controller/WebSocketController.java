@@ -1,14 +1,15 @@
 package com.example.taskboard.controller;
 
 import com.example.taskboard.dto.TaskDTO;
+import com.example.taskboard.dto.CommentDTO;
 import com.example.taskboard.dto.WebSocketMessage;
 import com.example.taskboard.service.TaskService;
+import com.example.taskboard.service.CommentService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -17,51 +18,82 @@ import org.springframework.stereotype.Controller;
 public class WebSocketController {
 
     private final TaskService taskService;
+    private final CommentService commentService;
     private final SimpMessagingTemplate messagingTemplate;
     private final Set<String> activeUsers = ConcurrentHashMap.newKeySet();
 
     @MessageMapping("/task.create")
-    @SendTo("/topic/tasks")
-    public WebSocketMessage createTask(TaskDTO taskDTO) {
+    public void  createTask(TaskDTO taskDTO) {
         TaskDTO createdTask = taskService.createTask(taskDTO);
-        return new WebSocketMessage(
+        WebSocketMessage message = new WebSocketMessage(
                 WebSocketMessage.MessageType.TASK_CREATED,
                 createdTask,
                 taskDTO.getCreatedBy(),
                 "Task created: " + createdTask.getTitle());
+        messagingTemplate.convertAndSend("/topic/board/" + createdTask.getBoardId(), message);
     }
 
     @MessageMapping("/task.update")
-    @SendTo("/topic/tasks")
-    public WebSocketMessage updateTask(TaskDTO taskDTO) {
+    public void  updateTask(TaskDTO taskDTO) {
         TaskDTO updatedTask = taskService.updateTask(taskDTO.getId(), taskDTO);
-        return new WebSocketMessage(
+        WebSocketMessage message = new WebSocketMessage(
                 WebSocketMessage.MessageType.TASK_UPDATED,
                 updatedTask,
                 null,
                 "Task updated: " + updatedTask.getTitle());
+        messagingTemplate.convertAndSend("/topic/board/" + updatedTask.getBoardId(), message);
     }
 
     @MessageMapping("/task.delete")
-    @SendTo("/topic/tasks")
-    public WebSocketMessage deleteTask(TaskDTO taskDTO) {
+    public void deleteTask(TaskDTO taskDTO) {
         taskService.deleteTask(taskDTO.getId());
-        return new WebSocketMessage(
-                WebSocketMessage.MessageType.TASK_DELETED,
-                taskDTO,
-                null,
-                "Task deleted: " + taskDTO.getTitle());
+        WebSocketMessage message = new WebSocketMessage(
+            WebSocketMessage.MessageType.TASK_DELETED,
+            taskDTO,
+            null,
+            "Task deleted: " + taskDTO.getTitle()
+        );
+        messagingTemplate.convertAndSend("/topic/board/" + taskDTO.getBoardId(), message);
     }
 
     @MessageMapping("/task.move")
-    @SendTo("/topic/tasks")
-    public WebSocketMessage moveTask(TaskDTO taskDTO) {
+    public void moveTask(TaskDTO taskDTO) {
         TaskDTO movedTask = taskService.moveTask(taskDTO.getId(), taskDTO.getStatus());
-        return new WebSocketMessage(
+        WebSocketMessage message = new WebSocketMessage(
                 WebSocketMessage.MessageType.TASK_MOVED,
                 movedTask,
                 null,
                 "Task moved to " + movedTask.getStatus());
+        messagingTemplate.convertAndSend("/topic/board/" + movedTask.getBoardId(), message);
+    }
+
+    @MessageMapping("/comment.create")
+    public void createComment(CommentDTO commentDTO) {
+        CommentDTO createdComment = commentService.createComment(commentDTO);
+        WebSocketMessage message = new WebSocketMessage(
+            WebSocketMessage.MessageType.COMMENT_CREATED,
+            null,
+            createdComment.getAuthor(),
+            createdComment.getContent()
+        );
+        message.setCommentId(createdComment.getId());
+        message.setTaskId(createdComment.getTaskId());
+        // Send to task-specific topic
+        messagingTemplate.convertAndSend("/topic/task/" + createdComment.getTaskId() + "/comments", message);
+    }
+    
+    @MessageMapping("/comment.delete")
+    public void deleteComment(CommentDTO commentDTO) {
+        commentService.deleteComment(commentDTO.getId());
+        WebSocketMessage message = new WebSocketMessage(
+            WebSocketMessage.MessageType.COMMENT_DELETED,
+            null,
+            null,
+            "Comment deleted"
+        );
+        message.setCommentId(commentDTO.getId());
+        message.setTaskId(commentDTO.getTaskId());
+        messagingTemplate.convertAndSend("/topic/task/" + commentDTO.getTaskId() + "/comments", message);
     }
 
     @MessageMapping("/user.join")

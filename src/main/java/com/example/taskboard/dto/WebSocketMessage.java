@@ -13,6 +13,15 @@ public class WebSocketMessage {
     private TaskDTO task;
     private String username;
     private String message;
+    private Long commentId;
+    private Long taskId;
+    
+    public WebSocketMessage(MessageType type, TaskDTO task, String username, String message) {
+        this.type = type;
+        this.task = task;
+        this.username = username;
+        this.message = message;
+    }
     
     public enum MessageType {
         TASK_CREATED,
@@ -22,6 +31,8 @@ public class WebSocketMessage {
         USER_JOINED,
         USER_LEFT,
         USER_TYPING,
-        USER_LIST
+        USER_LIST,
+        COMMENT_CREATED,
+        COMMENT_DELETED
     }
 }

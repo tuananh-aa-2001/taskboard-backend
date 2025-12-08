@@ -22,6 +22,12 @@ public class TaskService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    public List<TaskDTO> getTasksByBoardId(Long boardId) {
+        return taskRepository.findByBoardIdOrderByCreatedAtDesc(boardId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
     
     public TaskDTO getTaskById(Long id) {
         Task task = taskRepository.findById(id)
@@ -66,22 +72,23 @@ public class TaskService {
         return convertToDTO(updatedTask);
     }
     
-    private TaskDTO convertToDTO(Task task) {
-        return new TaskDTO(
-            task.getId(),
-            task.getTitle(),
-            task.getDescription(),
-            task.getStatus(),
-            task.getPriority(),
-            task.getAssignedTo(),
-            task.getDueDate(),
-            task.getCreatedAt(),
-            task.getUpdatedAt(),
-            task.getCreatedBy()
-        );
+     private TaskDTO convertToDTO(Task task) {
+        TaskDTO dto = new TaskDTO();
+        dto.setId(task.getId());
+        dto.setTitle(task.getTitle());
+        dto.setDescription(task.getDescription());
+        dto.setStatus(task.getStatus());
+        dto.setPriority(task.getPriority());
+        dto.setAssignedTo(task.getAssignedTo());
+        dto.setDueDate(task.getDueDate());
+        dto.setCreatedAt(task.getCreatedAt());
+        dto.setUpdatedAt(task.getUpdatedAt());
+        dto.setCreatedBy(task.getCreatedBy());
+        dto.setBoardId(task.getBoardId());
+        return dto;
     }
     
-    private Task convertToEntity(TaskDTO dto) {
+      private Task convertToEntity(TaskDTO dto) {
         Task task = new Task();
         task.setId(dto.getId());
         task.setTitle(dto.getTitle());
@@ -91,6 +98,7 @@ public class TaskService {
         task.setAssignedTo(dto.getAssignedTo());
         task.setDueDate(dto.getDueDate());
         task.setCreatedBy(dto.getCreatedBy());
+        task.setBoardId(dto.getBoardId());
         return task;
     }
 }

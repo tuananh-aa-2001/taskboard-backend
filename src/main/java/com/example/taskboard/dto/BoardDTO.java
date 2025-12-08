@@ -1,7 +1,5 @@
 package com.example.taskboard.dto;
 
-import com.example.taskboard.model.Priority;
-import com.example.taskboard.model.TaskStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -11,16 +9,12 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskDTO {
+public class BoardDTO {
     private Long id;
-    private String title;
+    private String name;
     private String description;
-    private TaskStatus status;
-    private Priority priority;
-    private String assignedTo;
-    private LocalDateTime dueDate;
+    private String owner;
+    private Boolean isPublic;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String createdBy;
-    private Long boardId;
 }

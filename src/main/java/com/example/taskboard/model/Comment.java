@@ -8,42 +8,29 @@ import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "comments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Task {
+public class Comment {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(nullable = false, length = 1000)
+    private String content;
+    
     @Column(nullable = false)
-    private String title;
+    private Long taskId;
     
-    @Column(length = 1000)
-    private String description;
-    
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status = TaskStatus.TODO;
-    
-    @Enumerated(EnumType.STRING)
-    private Priority priority = Priority.MEDIUM;
-    
-    private String assignedTo;
-
-    @Column(nullable = false)
-    private Long boardId;
-    
-    private LocalDateTime dueDate;
+    private String author;
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
     
     private LocalDateTime updatedAt = LocalDateTime.now();
-    
-    private String createdBy;
     
     @PreUpdate
     public void preUpdate() {
