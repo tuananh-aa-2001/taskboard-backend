@@ -33,6 +33,7 @@ public class WebSocketMessage {
         USER_TYPING,
         USER_LIST,
         COMMENT_CREATED,
-        COMMENT_DELETED
+        COMMENT_DELETED,
+        CHAT_MESSAGE
     }
 }

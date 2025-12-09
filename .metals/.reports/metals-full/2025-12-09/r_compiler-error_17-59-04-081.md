@@ -1,3 +1,21 @@
+file:///C:/typescript-code/taskboard/src/main/java/com/example/taskboard/controller/WebSocketController.java
+### java.util.NoSuchElementException: next on empty iterator
+
+occurred in the presentation compiler.
+
+presentation compiler configuration:
+Scala version: 3.3.1
+Classpath:
+<HOME>\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala3-library_3\3.3.1\scala3-library_3-3.3.1.jar [exists ], <HOME>\AppData\Local\Coursier\cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\2.13.10\scala-library-2.13.10.jar [exists ]
+Options:
+
+
+
+action parameters:
+offset: 793
+uri: file:///C:/typescript-code/taskboard/src/main/java/com/example/taskboard/controller/WebSocketController.java
+text:
+```scala
 package com.example.taskboard.controller;
 
 import com.example.taskboard.dto.TaskDTO;
@@ -10,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -20,7 +37,7 @@ public class WebSocketController {
 
     private final TaskService taskService;
     private final CommentService commentService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final SimpMess@@agingTemplate messagingTemplate;
     private final Set<String> activeUsers = ConcurrentHashMap.newKeySet();
 
     @MessageMapping("/task.create")
@@ -141,11 +158,25 @@ public class WebSocketController {
         );
         messagingTemplate.convertAndSend("/topic/users", listMessage);
     }
-
-    @MessageMapping("/chat.message")
-    @SendTo("/topic/chat")
-    public WebSocketMessage chatMessage(WebSocketMessage message) {
-        message.setType(WebSocketMessage.MessageType.CHAT_MESSAGE);
-        return message;
-    }
 }
+```
+
+
+
+#### Error stacktrace:
+
+```
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.HoverProvider$.hover(HoverProvider.scala:34)
+	scala.meta.internal.pc.ScalaPresentationCompiler.hover$$anonfun$1(ScalaPresentationCompiler.scala:352)
+```
+#### Short summary: 
+
+java.util.NoSuchElementException: next on empty iterator
